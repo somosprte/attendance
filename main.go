@@ -1,8 +1,10 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"sync"
@@ -24,12 +26,15 @@ type Meeting struct {
 var meetings = make(map[string]*Meeting)
 var meetingsMutex = &sync.Mutex{}
 
+//go:embed frontend/build/*
+var content embed.FS
+
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.Dir("frontend/build/static"))))
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "frontend/build/index.html") })
+	fsys, _ := fs.Sub(content, "frontend/build")
+	r.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(fsys))))
 
 	// API
 	r.Route("/api", func(r chi.Router) {
