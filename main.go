@@ -39,6 +39,7 @@ func main() {
 	// API
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/meetings", createMeeting)
+		r.Get("/meetings", getMeetings)
 		r.Post("/register/{meetingID}", registerAttendee) // Trocado de "registerParticipant" para "registerAttendee"
 		r.Get("/meetings/{meetingID}", getMeeting)
 	})
@@ -96,4 +97,9 @@ func getMeeting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(meeting)
+}
+
+func getMeetings(w http.ResponseWriter, r *http.Request) {
+
+	json.NewEncoder(w).Encode(meetings)
 }
