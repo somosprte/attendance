@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
@@ -44,8 +45,14 @@ func main() {
 		r.Get("/meetings/{meetingID}", getMeeting)
 	})
 
-	fmt.Println("Server running on :8000")
-	log.Fatal(http.ListenAndServe(":8000", r))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000" // Porta padrão se não for encontrada porta no ENV
+	}
+
+	fmt.Println("Server running on port " + port)
+
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
 func createMeeting(w http.ResponseWriter, r *http.Request) {
